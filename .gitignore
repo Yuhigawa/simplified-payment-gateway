@@ -1,0 +1,7 @@
+.git
+.env
+vendor/
+runtime/
+postgres_data/
+phpunit.xml.dist
+phpstan.neon.dist

@@ -1,0 +1,11 @@
+.git
+.gitignore
+runtime/*
+vendor
+postgres_data
+!runtime/.gitkeep
+docker-compose.yml
+Dockerfile*
+README.md
+phpunit.xml.dist
+phpstan.neon.dist
