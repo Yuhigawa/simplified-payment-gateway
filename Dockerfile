@@ -1,8 +1,10 @@
-FROM hyperf/hyperf:8.3-alpine-v3.22-swoole-slim AS BASE-IMAGE
+FROM hyperf/hyperf:8.3-alpine-v3.22-swoole-slim
 
 ENV TIMEZONE=America/Sao_Paulo \
     APP_ENV=prod \
-    APP_DEBUG=true
+    APP_DEBUG=true \
+    HOME=/app \
+    HF="php /app/bin/hyperf.php"
 
 RUN set -ex \
     && php -v \
@@ -20,26 +22,19 @@ RUN apk add --no-cache \
     php83-pgsql \
     postgresql-client
 
-RUN apk add --no-cache --virtual .build-deps \
-    $PHPIZE_DEPS \
-    php83-dev \
-    php83-pear \
-    openssl-dev \
-    && apk del .build-deps \
-    && rm -rf /tmp/* /var/cache/apk/*
+# RUN apk add --no-cache --virtual .build-deps \
+#     $PHPIZE_DEPS \
+#     php83-dev \
+#     php83-pear \
+#     openssl-dev \
+#     && apk del .build-deps \
+#     && rm -rf /tmp/* /var/cache/apk/*
 
 WORKDIR /app
 
 EXPOSE 9501
 
-FROM BASE-IMAGE
-
-WORKDIR /app
-
-ENV HOME=/app
 COPY . .
-
-COPY composer.json composer.lock* ./
 
 RUN composer install --ignore-platform-reqs --no-scripts --no-autoloader \
     && composer dump-autoload --optimize \
@@ -48,5 +43,4 @@ RUN composer install --ignore-platform-reqs --no-scripts --no-autoloader \
 RUN echo "alias hf='php /app/bin/hyperf.php'" >> /root/.bashrc \
     && source /root/.bashrc
 
-#CMD [ "sleep", "infinity" ]
-CMD ["sh", "-c", "if [ \"$USE_WATCH\" = 'false' ]; then php bin/hyperf.php start; else php bin/hyperf.php server:watch; fi"]
+CMD ["sh", "-c", "if [ \"$USE_WATCH\" = 'false' ]; then $HF start; else $HF server:watch; fi"]
