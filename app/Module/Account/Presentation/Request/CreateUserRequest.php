@@ -24,27 +24,27 @@ class CreateUserRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'name.required' => 'O nome é obrigatório.',
-            'name.string' => 'O nome deve ser um texto válido.',
-            'name.max' => 'O nome não pode ter mais de 200 caracteres.',
+            'name.required' => 'The name is required.',
+            'name.string' => 'The name must be a valid string.',
+            'name.max' => 'The name may not be greater than 200 characters.',
             
-            'email.required' => 'O e-mail é obrigatório.',
-            'email.string' => 'O e-mail deve ser um texto válido.',
-            'email.max' => 'O e-mail não pode ter mais de 200 caracteres.',
-            'email.unique' => 'Este e-mail já está cadastrado.',
+            'email.required' => 'The email is required.',
+            'email.string' => 'The email must be a valid string.',
+            'email.max' => 'The email may not be greater than 200 characters.',
+            'email.unique' => 'This email is already registered.',
             
-            'password.required' => 'A senha é obrigatória.',
-            'password.string' => 'A senha deve ser um texto válido.',
-            'password.max' => 'A senha não pode ter mais de 200 caracteres.',
+            'password.required' => 'The password is required.',
+            'password.string' => 'The password must be a valid string.',
+            'password.max' => 'The password may not be greater than 200 characters.',
             
-            'document.required' => 'O documento é obrigatório.',
-            'document.string' => 'O documento deve ser um texto válido.',
-            'document.max' => 'O documento não pode ter mais de 14 caracteres.',
-            'document.unique' => 'Este documento já está cadastrado.',
+            'document.required' => 'The document is required.',
+            'document.string' => 'The document must be a valid string.',
+            'document.max' => 'The document may not be greater than 14 characters.',
+            'document.unique' => 'This document is already registered.',
             
-            'document_type.required' => 'O tipo de documento é obrigatório.',
-            'document_type.string' => 'O tipo de documento deve ser um texto válido.',
-            'document_type.in' => 'O tipo de documento selecionado é inválido.',
+            'document_type.required' => 'The document type is required.',
+            'document_type.string' => 'The document type must be a valid string.',
+            'document_type.in' => 'The selected document type is invalid.',
         ];
     }
 }

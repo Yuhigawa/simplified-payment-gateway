@@ -8,7 +8,7 @@ This system provides a simplified payment gateway that allows:
 - User registration with CPF (individual users) or CNPJ (shopkeepers)
 - Money transfers between users
 - Money transfers from users to shopkeepers
-- Transaction authorization via external service
+- Transfer authorization via external service
 - Payment notifications via external service
 
 ## 🎯 Features
@@ -30,7 +30,7 @@ This system provides a simplified payment gateway that allows:
 - Users can send money to other users and shopkeepers
 - Shopkeepers can only receive transfers, they cannot send money
 - Balance validation before transfer
-- Transaction-based operations (rollback on failure)
+- Transfer-based operations (rollback on failure)
 - External authorization service integration
 - Payment notification service integration
 
@@ -47,7 +47,7 @@ This system provides a simplified payment gateway that allows:
 This project follows a **Modular Monolith** architecture pattern with Domain-Driven Design (DDD) principles. The application is organized into self-contained modules, each responsible for a specific business domain:
 
 - **Account Module**: Handles user management, registration, and user-related operations
-- **Transaction Module**: Manages money transfers, transaction processing, and payment operations
+- **Transfer Module**: Manages money transfers, Transfer processing, and payment operations
 
 Each module is independently structured with its own Domain, Application, Infrastructure, and Presentation layers, allowing for clear separation of concerns while maintaining a single deployable unit.
 
@@ -59,11 +59,11 @@ app/
 │   │   ├── Application/   # Application services
 │   │   ├── Infra/         # Infrastructure (repositories, external services)
 │   │   └── Presentation/  # Controllers, requests, resources
-│   └── Transaction/       # Transaction module - Money transfers
-│       ├── Domain/        # Transaction domain logic
+│   └── Transfer/       # Transfer module - Money transfers
+│       ├── Domain/        # Transfer domain logic
 │       ├── Application/   # Transfer services
-│       ├── Infra/         # Transaction repositories, external integrations
-│       └── Presentation/  # Transaction controllers, requests, resources
+│       ├── Infra/         # Transfer repositories, external integrations
+│       └── Presentation/  # Transfer controllers, requests, resources
 ├── Controller/            # Base controllers
 ├── Exception/             # Exception handlers
 └── Model/                 # Base model classes
@@ -260,16 +260,16 @@ Content-Type: application/json
 2. Validates payee exists
 3. Validates payer is not a shopkeeper (shopkeepers cannot send money)
 4. Calls external authorization service (`GET https://util.devi.tools/api/v2/authorize`)
-5. If authorized, executes transfer within a database transaction:
+5. If authorized, executes transfer within a database Transfer:
    - Deducts amount from payer's balance
    - Adds amount to payee's balance
 6. Calls notification service (`POST https://util.devi.tools/api/v1/notify`) to notify recipient
-7. If any step fails, transaction is rolled back and money returns to payer
+7. If any step fails, Transfer is rolled back and money returns to payer
 
 **Response (Success):**
 ```json
 {
-  "id": "transaction_id",
+  "id": "Transfer_id",
   "payer": 4,
   "payee": 15,
   "value": 100.0,
@@ -320,12 +320,12 @@ CREATE TABLE users (
    - Only users with `document_type = 'cpf'` can send money
    - Users with `document_type = 'cnpj'` (shopkeepers) can only receive
    - Payer must have sufficient balance
-   - All transfers are atomic (transaction-based)
+   - All transfers are atomic (Transfer-based)
    - External authorization is required before transfer
    - Notification is sent after successful transfer (non-blocking)
 
-3. **Transaction Safety:**
-   - All database operations are wrapped in transactions
+3. **Transfer Safety:**
+   - All database operations are wrapped in Transfers
    - On any failure, changes are rolled back
    - Balance is restored to payer if transfer fails
 
@@ -397,7 +397,7 @@ The project is organized as a **Modular Monolith** with two main modules:
 ├── app/
 │   ├── Module/
 │   │   ├── Account/          # Account Module - User management
-│   │   └── Transaction/       # Transaction Module - Transfer operations
+│   │   └── Transfer/       # Transfer Module - Transfer operations
 │   ├── Controller/           # Base controllers
 │   ├── Exception/            # Exception handlers
 │   └── Model/                # Base models
@@ -414,13 +414,13 @@ The project is organized as a **Modular Monolith** with two main modules:
 └── composer.json            # PHP dependencies
 ```
 
-Each module (Account and Transaction) is self-contained with its own domain logic, application services, infrastructure, and presentation layers, following the modular monolith pattern.
+Each module (Account and Transfer) is self-contained with its own domain logic, application services, infrastructure, and presentation layers, following the modular monolith pattern.
 
 ## 🤝 Contributing
 
 This is a simplified payment gateway implementation. Key areas for improvement:
-- Complete transaction module implementation
-- Add transaction history endpoints
+- Complete Transfer module implementation
+- Add Transfer history endpoints
 - Implement retry logic for external services
 - Add comprehensive test coverage
 - Implement rate limiting

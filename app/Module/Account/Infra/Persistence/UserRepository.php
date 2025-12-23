@@ -32,7 +32,7 @@ class UserRepository implements UserRepositoryInterface
         return $user;
     }
 
-    public function findUserById(int $id): ?User
+    public function findUserById(string|int $id): ?User
     {
         return $this->find($id, self::ID_COLUMN);
     }
@@ -58,5 +58,14 @@ class UserRepository implements UserRepositoryInterface
         }
 
         return null;
+    }
+
+    public function update(string|int $userId, array $data): bool
+    {
+        $affected = DB::table(self::TABLE_NAME)
+            ->where(self::ID_COLUMN, (int)$userId)
+            ->update($data);
+        
+        return $affected > 0;
     }
 }

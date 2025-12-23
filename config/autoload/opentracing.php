@@ -23,22 +23,21 @@ return [
     ],
     'tracer' => [
         'zipkin' => [
-            'driver' => \Hyperf\Tracer\Adapter\ZipkinTracerFactory::class,
+            'driver' => Hyperf\Tracer\Adapter\ZipkinTracerFactory::class,
             'app' => [
-                'name' => env('APP_NAME', 'skeleton'),
-                // Hyperf will detect the system info automatically as the value if ipv4, ipv6, port is null
-                'ipv4' => '127.0.0.1',
+                'name' => env('APP_NAME', 'hyperf'),
+                'ipv4' => null,
                 'ipv6' => null,
                 'port' => 9501,
             ],
             'options' => [
-                'endpoint_url' => env('ZIPKIN_ENDPOINT_URL', 'http://localhost:9411/api/v2/spans'),
-                'timeout' => env('ZIPKIN_TIMEOUT', 1),
+                'endpoint_url' => env('ZIPKIN_ENDPOINT_URL', 'http://zipkin:9411/api/v2/spans'),
+                'timeout' => 5,
             ],
             'sampler' => BinarySampler::createAsAlwaysSample(),
         ],
         'jaeger' => [
-            'driver' => \Hyperf\Tracer\Adapter\JaegerTracerFactory::class,
+            'driver' => Hyperf\Tracer\Adapter\JaegerTracerFactory::class,
             'name' => env('APP_NAME', 'skeleton'),
             'options' => [
                 'local_agent' => [

@@ -36,7 +36,7 @@ class UserService
             $user = $this->userRepository->save($data);
 
             if (!$user) {
-                throw new Exception('Usuário não foi criado.');
+                throw new Exception('User was not created.');
             }
             
             return $user;
@@ -56,7 +56,7 @@ class UserService
             $user = $this->userRepository->findUserById($userId);
 
             if (!$user) {
-                throw new Exception('Usuário não encontrado.');
+                throw new Exception('User not found.');
             }
 
             return $user;

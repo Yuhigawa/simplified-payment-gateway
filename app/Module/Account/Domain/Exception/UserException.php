@@ -18,11 +18,16 @@ class UserException extends HttpException
 
     public static function createUserException(): UnprocessableEntityHttpException
     {
-        return new UnprocessableEntityHttpException('Não foi possível criar o usuário.');
+        return new UnprocessableEntityHttpException('Unable to create user.');
     }
 
     public static function findUserException(): NotFoundHttpException
     {
-        return new NotFoundHttpException('Não foi possível encontrar o usuário.');
+        return new NotFoundHttpException('User not found.');
+    }
+
+    public static function balanceNotUpdateException(string $userId): UnprocessableEntityHttpException
+    {
+        return new UnprocessableEntityHttpException("Balance not updated on $userId");
     }
 }

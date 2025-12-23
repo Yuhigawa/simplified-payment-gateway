@@ -30,7 +30,7 @@
         "hyperf/redis": "^3.1",
         "hyperf/resource": "^3.1",
         "hyperf/snowflake": "^3.1",
-        "hyperf/tracer": "~3.1.0",
+        "hyperf/tracer": "^3.1",
         "hyperf/validation": "^3.1"
     },
     "require-dev": {

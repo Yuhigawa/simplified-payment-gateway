@@ -9,10 +9,10 @@ return [
             'namespace' => 'App\\Module\\Account',
             'path' => BASE_PATH . '/app/Module/Account',
         ],
-        'transaction' => [
+        'Transfer' => [
             'enabled' => true,
-            'namespace' => 'App\\Module\\Transaction',
-            'path' => BASE_PATH . '/app/Module/Transaction',
+            'namespace' => 'App\\Module\\Transfer',
+            'path' => BASE_PATH . '/app/Module/Transfer',
             // 'depends_on' => ['account'],
         ],
     ],
