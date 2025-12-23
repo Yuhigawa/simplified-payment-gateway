@@ -1,8 +1,13 @@
 .git
 .gitignore
 runtime/*
-vendor
-postgres_data
+.config/
+.phpunit.cache/
+.composer/
+.bash_history
+vendor/
+postgres_data/
+dragonfly_data/
 !runtime/.gitkeep
 docker-compose.yml
 Dockerfile*

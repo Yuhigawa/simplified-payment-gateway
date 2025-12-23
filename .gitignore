@@ -1,7 +1,15 @@
 .git
 .env
+.bash_history
+
+phpunit.xml.dist
+phpstan.neon.dist
+Dockerfile.bkp
+
+.config/
+.phpunit.cache/
+.composer/
 vendor/
 runtime/
 postgres_data/
-phpunit.xml.dist
-phpstan.neon.dist
+dragonfly_data/

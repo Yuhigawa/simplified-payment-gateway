@@ -15,7 +15,7 @@ namespace App\Exception\Handler;
 use Hyperf\Contract\StdoutLoggerInterface;
 use Hyperf\ExceptionHandler\ExceptionHandler;
 use Hyperf\HttpMessage\Stream\SwooleStream;
-use Psr\Http\Message\ResponseInterface;
+use Swow\Psr7\Message\ResponsePlusInterface;
 use Throwable;
 
 class AppExceptionHandler extends ExceptionHandler
@@ -24,15 +24,24 @@ class AppExceptionHandler extends ExceptionHandler
     {
     }
 
-    public function handle(Throwable $throwable, ResponseInterface $response)
+    public function handle(Throwable $throwable, ResponsePlusInterface $response)
     {
         $this->logger->error(sprintf('%s[%s] in %s', $throwable->getMessage(), $throwable->getLine(), $throwable->getFile()));
         $this->logger->error($throwable->getTraceAsString());
-        return $response->withHeader('Server', 'Hyperf')->withStatus(500)->withBody(new SwooleStream('Internal Server Error.'));
+        $this->stopPropagation();
+        return $response->addHeader('Server', 'Hyperf')->setStatus(500)->setBody(new SwooleStream('Internal Server Error.'));
     }
 
     public function isValid(Throwable $throwable): bool
     {
+        // Don't handle HTTP exceptions - let HttpExceptionHandler handle them
+        if ($throwable instanceof \Hyperf\HttpMessage\Exception\HttpException) {
+            return false;
+        }
+        // Don't handle validation exceptions - let ValidationExceptionHandler handle them
+        if ($throwable instanceof \Hyperf\Validation\ValidationException) {
+            return false;
+        }
         return true;
     }
 }
