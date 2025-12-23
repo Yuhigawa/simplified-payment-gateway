@@ -40,7 +40,4 @@ RUN composer install --ignore-platform-reqs --no-scripts --no-autoloader \
     && composer dump-autoload --optimize \
     && mkdir -p /app/runtime/container/proxy /app/runtime/logs
 
-RUN echo "alias hf='php /app/bin/hyperf.php'" >> /root/.bashrc \
-    && source /root/.bashrc
-
 CMD ["sh", "-c", "if [ \"$USE_WATCH\" = 'false' ]; then $HF start; else $HF server:watch; fi"]
