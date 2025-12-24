@@ -98,7 +98,7 @@ app/
 
 1. Clone the repository:
 ```bash
-git clone <repository-url>
+git clone git@github.com:Yuhigawa/simplified-payment-gateway.git
 cd simplified-payment-gateway
 ```
 
@@ -203,7 +203,7 @@ Content-Type: application/json
   "email": "john.doe@example.com",
   "document": "12345678901",
   "document_type": "cpf",
-  "balance": 10000,
+  "balance": 100.00,
   "created_at": "2025-12-22T20:41:26.000000Z",
   "updated_at": "2025-12-22T20:41:26.000000Z"
 }
@@ -240,7 +240,7 @@ GET /api/v1/accounts/{userId}
 
 #### Transfer Money
 ```http
-POST /transfer
+POST /api/v1/transactions/transfer
 Content-Type: application/json
 
 {
@@ -269,9 +269,23 @@ Content-Type: application/json
 **Response (Success):**
 ```json
 {
-  "id": "Transfer_id",
-  "payer": 4,
-  "payee": 15,
+  "id": "1234567890123456789",
+  "payer": {
+    "id": "4",
+    "name": "John Doe",
+    "email": "john@example.com",
+    "document": "12345678901",
+    "document_type": "cpf",
+    "balance": "50.00"
+  },
+  "payee": {
+    "id": "15",
+    "name": "Jane Doe",
+    "email": "jane@example.com",
+    "document": "98765432100",
+    "document_type": "cpf",
+    "balance": "150.00"
+  },
   "value": 100.0,
   "status": "completed",
   "created_at": "2025-12-22T20:41:26.000000Z"
@@ -308,6 +322,30 @@ CREATE TABLE users (
 - `balance`: Stored in cents (integer)
 - `document`: CPF (11 digits) or CNPJ (14 digits)
 - `document_type`: `cpf` for regular users, `cnpj` for shopkeepers
+
+### Transactions Table
+```sql
+CREATE TABLE Transfers (
+    id BIGINT PRIMARY KEY,
+    value BIGINT NOT NULL,
+    payer_id BIGINT NOT NULL,
+    payee_id BIGINT NOT NULL,
+    status ENUM('pending', 'completed', 'failed') DEFAULT 'pending',
+    created_at TIMESTAMP,
+    updated_at TIMESTAMP,
+    FOREIGN KEY (payer_id) REFERENCES users(id) ON DELETE RESTRICT ON UPDATE CASCADE,
+    FOREIGN KEY (payee_id) REFERENCES users(id) ON DELETE RESTRICT ON UPDATE CASCADE,
+    INDEX idx_payer_id (payer_id),
+    INDEX idx_payee_id (payee_id),
+    INDEX idx_status (status),
+    INDEX idx_created_at (created_at)
+);
+```
+
+**Notes:**
+- `id`: Snowflake ID (string representation of big integer)
+- `value`: Stored in cents (integer)
+- `status`: Transfer status (`pending`, `completed`, `failed`)
 
 ## 🔐 Business Rules
 
