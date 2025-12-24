@@ -4,25 +4,24 @@ declare(strict_types=1);
 
 namespace App\Module\Transaction\Application\Handler;
 
+use GuzzleHttp\Client;
+use Psr\Log\LoggerInterface;
+use Hyperf\Logger\LoggerFactory;
+use Hyperf\Contract\ContainerInterface;
+
 use App\Module\Transaction\Domain\Exception\TransferException;
 use App\Module\Transaction\Domain\Handler\AbstractTransferHandler;
-use GuzzleHttp\Client;
-use GuzzleHttp\Exception\GuzzleException;
-use Hyperf\Di\Annotation\Inject;
-use Hyperf\Logger\LoggerFactory;
-use Psr\Log\LoggerInterface;
 
 class AuthorizeTransferHandler extends AbstractTransferHandler
 {
     private const AUTHORIZATION_URL = 'https://util.devi.tools/api/v2/authorize';
     private const TIMEOUT = 5; // segundos
 
-    #[Inject]
-    protected LoggerFactory $loggerFactory;
+    protected LoggerInterface $logger;
 
-    private function getLogger(): LoggerInterface
+    public function __construct(ContainerInterface $container)
     {
-        return $this->loggerFactory->get('default');
+        $this->logger = $container->get(LoggerFactory::class)->get('default');
     }
 
     protected function process(TransferContext $context): void
@@ -38,7 +37,7 @@ class AuthorizeTransferHandler extends AbstractTransferHandler
             if (isset($body['status']) && $body['status'] === 'success') {
                 $context->setAuthorized(true);
 
-                $this->getLogger()->info('[AuthorizeTransfer] - Transfer authorized', [
+                $this->logger->info('[AuthorizeTransfer] - Transfer authorized', [
                     'amount' => $context->getAmountAsFloat(),
                 ]);
 
@@ -46,7 +45,7 @@ class AuthorizeTransferHandler extends AbstractTransferHandler
             }
 
             if (isset($body['status']) && $body['status'] === 'fail') {
-                $this->getLogger()->warning('[AuthorizeTransfer] - Transfer not authorized by external service', [
+                $this->logger->warning('[AuthorizeTransfer] - Transfer not authorized by external service', [
                     'response' => $body,
                 ]);
 
@@ -56,8 +55,8 @@ class AuthorizeTransferHandler extends AbstractTransferHandler
 
             $context->addError('Transfer not authorized');
             throw TransferException::notAuthorized();
-        } catch (GuzzleException $e) {
-            $this->getLogger()->error('[AuthorizeTransfer] - Authorization service error', [
+        } catch (\Throwable $e) {
+            $this->logger->error('[AuthorizeTransfer] - Authorization service error', [
                 'error' => $e->getMessage(),
             ]);
 

@@ -9,18 +9,26 @@ use Hyperf\HttpServer\Annotation\Controller;
 
 use App\Module\Transaction\Application\Service\TransferService;
 use App\Module\Transaction\Presentation\Request\TransferRequest;
-use App\Module\Transaction\Presentation\Resource\TransferResource;
 
 #[Controller]
 class TransferController
 {
     #[Inject]
-    protected readonly TransferService $transferService;
+    protected TransferService $transferService;
 
-    public function transfer(TransferRequest $request): TransferResource
+    public function transfer(TransferRequest $request): array
     {
-        $transaction = $this->transferService->transfer($request->validated());
+        $this->transferService->transfer($request->validated());
 
-        return TransferResource::make($transaction);
-    }   
+        return [
+            'message' => 'Transfer request queued successfully',
+            'status' => 'queued',
+        ];
+    }
+
+    public function sse()
+    {
+        // TODO: implement sse to return transations status
+        return 200;
+    }
 }

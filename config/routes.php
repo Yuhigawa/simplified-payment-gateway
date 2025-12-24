@@ -28,5 +28,6 @@ Router::addGroup('/api/v1/accounts', function () {
 
 // Transfer Module Routes
 Router::addGroup('/api/v1/transactions', function () {
-    Router::post('/transfer', [TransferController::class,'transfer']);
+    Router::post('/transfer', [TransferController::class, 'transfer']);
+    Router::get('/transaction-sse', [TransferController::class, 'sse']);
 });

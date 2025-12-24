@@ -27,4 +27,3 @@ abstract class AbstractTransferHandler implements TransferHandlerInterface
 
     abstract protected function process(TransferContext $context): void;
 }
-

@@ -3,7 +3,7 @@ config:
   processor: "./heavy-processor.js"
 
   phases:
-    - duration: 120
+    - duration: 300
       arrivalRate: 500
       rampTo: 3000
       name: "Ramp Up"
@@ -14,12 +14,10 @@ config:
 scenarios:
   - name: "Heavy Transfers"
     flow:
+      - function: "buildTransfer"
       - post:
           url: "/api/v1/transactions/transfer"
-          json:
-            value: 1
-            payer: "{{ $randomPick(cpfUser1Id, cpfUser2Id) }}"
-            payee: "{{ cnpjUserId }}"
+          json: "{{ $json }}"
           expect:
             - statusCode:
                 - 200

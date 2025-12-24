@@ -44,5 +44,10 @@ class TransferException extends HttpException
     {
         return new UnprocessableEntityHttpException($errors);
     }
+
+    public static function queueFailed(string $message): BadRequestHttpException
+    {
+        return new BadRequestHttpException('Failed to queue transfer: ' . $message);
+    }
 }
 

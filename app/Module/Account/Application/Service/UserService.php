@@ -12,14 +12,14 @@ use Hyperf\Logger\LoggerFactory;
 use Hyperf\Di\Annotation\Inject;
 use Hyperf\Context\ApplicationContext;
 
+use App\Module\Account\Domain\Entity\User;
 use App\Module\Account\Domain\Exception\UserException;
 use App\Module\Account\Infra\Persistence\UserRepository;
-use App\Module\Account\Domain\Entity\User;
 
 class UserService
 {
     #[Inject]
-    private readonly UserRepository $userRepository;
+    private UserRepository $userRepository;
 
     #[Inject]
     protected LoggerInterface $logger;
@@ -41,7 +41,7 @@ class UserService
             }
             
             return $user;
-        } catch (Throwable $e) {
+        } catch (\Throwable $e) {
             $this->logger->debug('[USER-SERVICE] - createUser', [
                 'msg' => $e->getMessage()
             ]);
@@ -60,7 +60,7 @@ class UserService
             }
 
             return $user;
-        } catch(Throwable $e) {
+        } catch(\Throwable $e) {
             $this->logger->debug('[USER-SERVICE] - findUser', [
                 'msg' => $e->getMessage()
             ]);

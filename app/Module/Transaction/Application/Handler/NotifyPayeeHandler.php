@@ -4,12 +4,13 @@ declare(strict_types=1);
 
 namespace App\Module\Transaction\Application\Handler;
 
-use App\Module\Transaction\Domain\Handler\AbstractTransferHandler;
 use GuzzleHttp\Client;
-use GuzzleHttp\Exception\GuzzleException;
-use Hyperf\Di\Annotation\Inject;
-use Hyperf\Logger\LoggerFactory;
 use Psr\Log\LoggerInterface;
+use Hyperf\Logger\LoggerFactory;
+use Hyperf\Contract\ContainerInterface;
+
+use App\Module\Transaction\Domain\Handler\AbstractTransferHandler;
+
 use function Hyperf\Coroutine\co;
 
 class NotifyPayeeHandler extends AbstractTransferHandler
@@ -17,12 +18,11 @@ class NotifyPayeeHandler extends AbstractTransferHandler
     private const NOTIFICATION_URL = 'https://util.devi.tools/api/v1/notify';
     private const TIMEOUT = 3; // segundos
 
-    #[Inject]
-    protected LoggerFactory $loggerFactory;
+    protected LoggerInterface $logger;
 
-    private function getLogger(): LoggerInterface
+    public function __construct(ContainerInterface $container)
     {
-        return $this->loggerFactory->get('default');
+        $this->logger = $container->get(LoggerFactory::class)->get('default');
     }
 
     protected function process(TransferContext $context): void
@@ -34,7 +34,7 @@ class NotifyPayeeHandler extends AbstractTransferHandler
     {
         $payeeEmail = $context->getPayee()->email;
         $amount = $context->getAmountAsFloat();
-        $logger = $this->getLogger();
+        $logger = $this->logger;
 
         co(function () use ($payeeEmail, $amount, $logger) {
             try {
@@ -53,12 +53,6 @@ class NotifyPayeeHandler extends AbstractTransferHandler
                     'payee_email' => $payeeEmail,
                     'amount' => $amount,
                     'status_code' => $response->getStatusCode(),
-                ]);
-            } catch (GuzzleException $e) {
-                $logger->error('[NotifyPayee] - Failed to send notification', [
-                    'payee_email' => $payeeEmail,
-                    'amount' => $amount,
-                    'error' => $e->getMessage(),
                 ]);
             } catch (\Throwable $e) {
                 $logger->error('[NotifyPayee] - Unexpected error sending notification', [

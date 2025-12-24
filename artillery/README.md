@@ -111,5 +111,5 @@ Heavy Load	Performance & scalability testing	Very High
   Increase open file limit
 
   ```
-    ulimit -n 100000
+  ulimit -n 100000
   ```

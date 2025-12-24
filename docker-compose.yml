@@ -32,6 +32,18 @@ services:
     volumes:
       - dragonfly_data:/data
 
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: hyperf_user
+      RABBITMQ_DEFAULT_PASS: hyperf_password
+    volumes:
+      - rabbitmq-data:/var/lib/rabbitmq
+
   zipkin:
     image: openzipkin/zipkin:latest
     container_name: zipkin
@@ -39,6 +51,7 @@ services:
       - "9411:9411"
 
 volumes:
+  rabbitmq-data:
   dragonfly_data:
   postgres_data:
     driver: local

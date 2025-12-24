@@ -4,20 +4,23 @@ declare(strict_types=1);
 
 namespace App\Module\Transaction\Application\Service;
 
-use App\Module\Account\Domain\Repository\UserRepositoryInterface;
-use App\Module\Transaction\Application\Handler\AuthorizeTransferHandler;
-use App\Module\Transaction\Application\Handler\ExecuteTransferHandler;
-use App\Module\Transaction\Application\Handler\NotifyPayeeHandler;
-use App\Module\Transaction\Application\Handler\TransferContext;
-use App\Module\Transaction\Application\Handler\ValidateBalanceHandler;
-use App\Module\Transaction\Application\Handler\ValidateUserTypeHandler;
-use App\Module\Transaction\Domain\Exception\TransferException;
-use App\Module\Transaction\Domain\Handler\AbstractTransferHandler;
-use App\Module\Transaction\Domain\Entity\Transaction;
+use Hyperf\Amqp\Producer;
 use Hyperf\Di\Annotation\Inject;
 use Hyperf\Logger\LoggerFactory;
 use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
+
+use App\Module\Transaction\Domain\Entity\Transaction;
+use App\Module\Transaction\Infra\Amqp\TransferProducer;
+use App\Module\Transaction\Domain\Exception\TransferException;
+use App\Module\Transaction\Application\Handler\TransferContext;
+use App\Module\Account\Domain\Repository\UserRepositoryInterface;
+use App\Module\Transaction\Application\Handler\NotifyPayeeHandler;
+use App\Module\Transaction\Domain\Handler\AbstractTransferHandler;
+use App\Module\Transaction\Application\Handler\ExecuteTransferHandler;
+use App\Module\Transaction\Application\Handler\ValidateBalanceHandler;
+use App\Module\Transaction\Application\Handler\ValidateUserTypeHandler;
+use App\Module\Transaction\Application\Handler\AuthorizeTransferHandler;
 
 class TransferService
 {
@@ -30,15 +33,25 @@ class TransferService
     #[Inject]
     protected ContainerInterface $container;
 
-    private function getLogger(): LoggerInterface
+    #[Inject]
+    protected Producer $producer;
+
+    #[Inject]
+    protected LoggerInterface $logger;
+
+    public function __construct(ContainerInterface $container)
     {
-        return $this->loggerFactory->get('default');
+        $this->logger = $container->get(LoggerFactory::class)->get('default');
     }
 
-    public function transfer(array $data): Transaction
+    public function transfer(array $data): void
     {
+        $this->logger->info('[TransferService] - transfer', [
+            'data' => $data,
+        ]);
+
         // Balance is integer so we convert cents to full balance
-        $amount = $this->normalizarValor($data['value']);
+        $data['value'] = $this->normalizarValor($data['value']);
         $payerId = $data['payer'];
         $payeeId = $data['payee'];
 
@@ -53,12 +66,46 @@ class TransferService
             throw TransferException::payeeNotFound();
         }
 
-        $this->getLogger()->debug('[TransferService] - transfer', [
-            'payer_balance' => $payer->balance,
-            'payee_balance' => $payee->balance,
+        try {
+            $producerMessage = new TransferProducer($data);
+            $this->producer->produce($producerMessage);
+
+            $this->logger->info('[TransferService] - Transfer request queued successfully', [
+                'payer' => $data['payer'] ?? null,
+                'payee' => $data['payee'] ?? null,
+                'value' => $data['value'] ?? null,
+            ]);
+        } catch (\Throwable $e) {
+            $this->logger->error('[TransferService] - Failed to queue transfer request', [
+                'error' => $e->getMessage(),
+                'data' => $data,
+            ]);
+
+            throw TransferException::queueFailed($e->getMessage());
+        }
+    }
+
+    public function processTransfer(array $data): ?Transaction
+    {
+        $this->logger->debug('[TransferService] - processTransfer', [
+            'data' => $data,
         ]);
 
-        $context = new TransferContext($amount, $payer, $payee);
+        $payerId = $data['payer'];
+        $payeeId = $data['payee'];
+
+        $payer = $this->userRepository->findUserById($payerId);
+        $payee = $this->userRepository->findUserById($payeeId);
+
+        if (!$payer) {
+            throw TransferException::payerNotFound();
+        }
+
+        if (!$payee) {
+            throw TransferException::payeeNotFound();
+        }
+
+        $context = new TransferContext($data['value'], $payer, $payee);
 
         try {
             $validateUserType = $this->startHandler();
@@ -74,20 +121,16 @@ class TransferService
 
             return $context->getTransaction();
         } catch (\Throwable $e) {
-            $this->getLogger()->error('Transfer failed', [
-                'payer_id' => $payerId,
-                'payer_balance' => $payer->balance,
-                'payee_id' => $payeeId,
-                'payee_balance' => $payee->balance,
-                'amount' => $amount,
+            $this->logger->error('[TransferService] - Transfer failed', [
+                'data' => $data,
                 'error' => $e->getMessage(),
             ]);
 
-            throw $e;
+            return null;
         }
     }
 
-    // TODO: send to helper function
+    // TODO: move to a helper function
     private function normalizarValor(int|float $valor): int
     {
         if (floor($valor) != $valor) {

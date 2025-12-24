@@ -16,7 +16,7 @@ use App\Module\Account\Presentation\Request\CreateUserRequest;
 class UserController
 {
     #[Inject]
-    protected readonly UserService $userService;
+    protected UserService $userService;
 
     public function store(CreateUserRequest $request): UserResource
     {

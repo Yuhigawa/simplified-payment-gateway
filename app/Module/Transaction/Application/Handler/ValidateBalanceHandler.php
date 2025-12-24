@@ -6,19 +6,18 @@ namespace App\Module\Transaction\Application\Handler;
 
 use Psr\Log\LoggerInterface;
 use Hyperf\Logger\LoggerFactory;
-use Hyperf\Di\Annotation\Inject;
+use Psr\Container\ContainerInterface;
 
 use App\Module\Transaction\Domain\Exception\TransferException;
 use App\Module\Transaction\Domain\Handler\AbstractTransferHandler;
 
 class ValidateBalanceHandler extends AbstractTransferHandler
 {
-    #[Inject]
-    protected LoggerFactory $loggerFactory;
+    protected LoggerInterface $logger;
 
-    private function getLogger(): LoggerInterface
+    public function __construct(ContainerInterface $container)
     {
-        return $this->loggerFactory->get('default');
+        $this->logger = $container->get(LoggerFactory::class)->get('default');
     }
 
     protected function process(TransferContext $context): void
@@ -27,7 +26,7 @@ class ValidateBalanceHandler extends AbstractTransferHandler
         $fullAmount = $context->getAmount();
         $currentBalance = (int) $payer->balance;
 
-        $this->getLogger()->info('[ValidateBalance] - handler', [
+        $this->logger->info('[ValidateBalance] - handler', [
             'payer_balance' => $currentBalance,
             'amount' => $fullAmount,
         ]);

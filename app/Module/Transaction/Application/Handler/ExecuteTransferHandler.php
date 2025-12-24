@@ -6,22 +6,24 @@ namespace App\Module\Transaction\Application\Handler;
 
 use App\Module\Account\Domain\Exception\UserException;
 use App\Module\Account\Domain\Repository\UserRepositoryInterface;
-use App\Module\Account\Infra\Persistence\UserRepository;
 use App\Module\Transaction\Domain\Entity\Transaction;
 use App\Module\Transaction\Domain\Exception\TransferException;
 use App\Module\Transaction\Domain\Handler\AbstractTransferHandler;
 use App\Module\Transaction\Domain\Repository\TransactionRepositoryInterface;
 use App\Module\Transaction\Domain\ValueObject\TransactionStatus;
 use Hyperf\DbConnection\Db;
-use Hyperf\Di\Annotation\Inject;
+use Hyperf\Contract\ContainerInterface;
 
 class ExecuteTransferHandler extends AbstractTransferHandler
 {
-    #[Inject]
     protected UserRepositoryInterface $userRepository;
-
-    #[Inject]
     protected TransactionRepositoryInterface $transactionRepository;
+
+    public function __construct(ContainerInterface $container)
+    {
+        $this->userRepository = $container->get(UserRepositoryInterface::class);
+        $this->transactionRepository = $container->get(TransactionRepositoryInterface::class);
+    }
 
     protected function process(TransferContext $context): void
     {
