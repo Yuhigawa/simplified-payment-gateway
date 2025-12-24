@@ -1,0 +1,26 @@
+config:
+  target: "http://localhost:9501"
+  processor: "./heavy-processor.js"
+
+  phases:
+    - duration: 120
+      arrivalRate: 500
+      rampTo: 3000
+      name: "Ramp Up"
+    - duration: 900
+      arrivalRate: 3000
+      name: "Sustained Heavy Load"
+
+scenarios:
+  - name: "Heavy Transfers"
+    flow:
+      - post:
+          url: "/api/v1/transactions/transfer"
+          json:
+            value: 1
+            payer: "{{ $randomPick(cpfUser1Id, cpfUser2Id) }}"
+            payee: "{{ cnpjUserId }}"
+          expect:
+            - statusCode:
+                - 200
+                - 201

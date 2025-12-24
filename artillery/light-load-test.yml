@@ -1,0 +1,137 @@
+config:
+  target: "http://localhost:9501"
+  phases:
+    # Phase 1: Setup - Create users
+    - duration: 1
+      arrivalCount: 1
+      name: "Setup Phase"
+    # Phase 2: Warm up - Gradual load increase
+    - duration: 30
+      arrivalRate: 5
+      rampTo: 20
+      name: "Warm Up"
+    # Phase 3: Load test - Sustained high load
+    - duration: 60
+      arrivalRate: 50
+      name: "Load Test"
+    # Phase 4: Spike test - Maximum load
+    - duration: 20
+      arrivalRate: 100
+      name: "Spike Test"
+  processor: "./ligh-processor.js"
+  variables:
+    cpfUser1Id: ""
+    cpfUser2Id: ""
+    cnpjUserId: ""
+
+scenarios:
+  # Setup scenario - runs first to create users
+  - name: "Setup Users"
+    weight: 0
+    flow:
+      - post:
+          url: "/api/v1/accounts/users"
+          json:
+            name: "CPF User 1 - {{ $randomString() }}"
+            email: "cpf1_{{ $randomString() }}@loadtest.com"
+            password: "Test123!@#"
+            document: "{{ $randomNumber(10000000000, 99999999999) }}"
+            document_type: "cpf"
+            balance: 1000000
+          capture:
+            - json: "$.id"
+              as: "cpfUser1Id"
+          expect:
+            - statusCode: 201
+
+      - post:
+          url: "/api/v1/accounts/users"
+          json:
+            name: "CPF User 2 - {{ $randomString() }}"
+            email: "cpf2_{{ $randomString() }}@loadtest.com"
+            password: "Test123!@#"
+            document: "{{ $randomNumber(10000000000, 99999999999) }}"
+            document_type: "cpf"
+            balance: 1000000
+          capture:
+            - json: "$.id"
+              as: "cpfUser2Id"
+          expect:
+            - statusCode: 201
+
+      - post:
+          url: "/api/v1/accounts/users"
+          json:
+            name: "CNPJ User (Merchant) - {{ $randomString() }}"
+            email: "merchant_{{ $randomString() }}@loadtest.com"
+            password: "Test123!@#"
+            document: "{{ $randomNumber(10000000000000, 99999999999999) }}"
+            document_type: "cnpj"
+            balance: 0
+          capture:
+            - json: "$.id"
+              as: "cnpjUserId"
+          expect:
+            - statusCode: 201
+
+  # Main transaction scenario
+  - name: "CPF to CPF Transfer"
+    weight: 40
+    flow:
+      - post:
+          url: "/api/v1/transactions/transfer"
+          json:
+            value: "{{ $randomNumber(1, 100) }}"
+            payer: "{{ cpfUser1Id }}"
+            payee: "{{ cpfUser2Id }}"
+          expect:
+            - statusCode: 
+                - 200
+                - 201
+                - 400  # May fail due to insufficient balance or authorization
+
+  - name: "CPF to CNPJ Transfer (Customer to Merchant)"
+    weight: 40
+    flow:
+      - post:
+          url: "/api/v1/transactions/transfer"
+          json:
+            value: "{{ $randomNumber(10, 200) }}"
+            payer: "{{ cpfUser1Id }}"
+            payee: "{{ cnpjUserId }}"
+          expect:
+            - statusCode:
+                - 200
+                - 201
+                - 400
+
+  - name: "Reverse CPF to CPF Transfer"
+    weight: 15
+    flow:
+      - post:
+          url: "/api/v1/transactions/transfer"
+          json:
+            value: "{{ $randomNumber(1, 100) }}"
+            payer: "{{ cpfUser2Id }}"
+            payee: "{{ cpfUser1Id }}"
+          expect:
+            - statusCode:
+                - 200
+                - 201
+                - 400
+
+  # This should fail - CNPJ cannot send money
+  - name: "Invalid CNPJ Transfer (Should Fail)"
+    weight: 5
+    flow:
+      - post:
+          url: "/api/v1/transactions/transfer"
+          json:
+            value: "{{ $randomNumber(1, 50) }}"
+            payer: "{{ cnpjUserId }}"
+            payee: "{{ cpfUser1Id }}"
+          expect:
+            - statusCode:
+                - 400
+                - 403
+                - 422

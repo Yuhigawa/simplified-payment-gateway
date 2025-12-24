@@ -1,0 +1,17 @@
+{
+  "name": "artillery",
+  "main": "index.js",
+  "scripts": {
+    "test:light": "artillery run light-load-test.yml",
+    "test:heavy": "artillery run heavy-load-test.yml",
+    "test:light-report": "npm run test:light && artillery report report.json",
+    "test:heavy-report": "npm run test:heavy && artillery report report.json"
+  },
+  "author": "yuhigawa",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "artillery": "^2.0.27",
+    "axios": "^1.13.2"
+  }
+}
