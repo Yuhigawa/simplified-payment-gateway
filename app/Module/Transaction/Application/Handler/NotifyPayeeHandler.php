@@ -49,19 +49,19 @@ class NotifyPayeeHandler extends AbstractTransferHandler
                     ],
                 ]);
 
-                $logger->info('Notification sent successfully', [
+                $logger->info('[NotifyPayee] - Notification sent successfully', [
                     'payee_email' => $payeeEmail,
                     'amount' => $amount,
                     'status_code' => $response->getStatusCode(),
                 ]);
             } catch (GuzzleException $e) {
-                $logger->error('Failed to send notification', [
+                $logger->error('[NotifyPayee] - Failed to send notification', [
                     'payee_email' => $payeeEmail,
                     'amount' => $amount,
                     'error' => $e->getMessage(),
                 ]);
             } catch (\Throwable $e) {
-                $logger->error('Unexpected error sending notification', [
+                $logger->error('[NotifyPayee] - Unexpected error sending notification', [
                     'payee_email' => $payeeEmail,
                     'error' => $e->getMessage(),
                 ]);

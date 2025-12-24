@@ -11,6 +11,7 @@ class CreateUserRequest extends FormRequest
 {
     public function rules(): array
     {
+        // TODO: properly validate document with it's type
         return [
             'name' => 'required|string|max:200',
             'email' => 'required|string|email|max:200|unique:users,email',

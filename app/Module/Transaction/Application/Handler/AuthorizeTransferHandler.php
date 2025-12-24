@@ -38,7 +38,7 @@ class AuthorizeTransferHandler extends AbstractTransferHandler
             if (isset($body['status']) && $body['status'] === 'success') {
                 $context->setAuthorized(true);
 
-                $this->getLogger()->info('Transfer authorized', [
+                $this->getLogger()->info('[AuthorizeTransfer] - Transfer authorized', [
                     'amount' => $context->getAmountAsFloat(),
                 ]);
 
@@ -46,7 +46,7 @@ class AuthorizeTransferHandler extends AbstractTransferHandler
             }
 
             if (isset($body['status']) && $body['status'] === 'fail') {
-                $this->getLogger()->warning('Transfer not authorized by external service', [
+                $this->getLogger()->warning('[AuthorizeTransfer] - Transfer not authorized by external service', [
                     'response' => $body,
                 ]);
 
@@ -57,7 +57,7 @@ class AuthorizeTransferHandler extends AbstractTransferHandler
             $context->addError('Transfer not authorized');
             throw TransferException::notAuthorized();
         } catch (GuzzleException $e) {
-            $this->getLogger()->error('Authorization service error', [
+            $this->getLogger()->error('[AuthorizeTransfer] - Authorization service error', [
                 'error' => $e->getMessage(),
             ]);
 

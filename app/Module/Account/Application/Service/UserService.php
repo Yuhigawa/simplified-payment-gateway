@@ -32,6 +32,7 @@ class UserService
 
     public function createUser(array $data): User
     {
+        // TOOD: if the cache is out of service the users will be created in pgsql but will return error in the api.
         try {
             $user = $this->userRepository->save($data);
 
@@ -51,7 +52,6 @@ class UserService
 
     public function findUser(int $userId): User
     {
-        // TOOD: if the cache is out of service the users will be created in pgsql but will return error in the api.
         try {
             $user = $this->userRepository->findUserById($userId);
 
