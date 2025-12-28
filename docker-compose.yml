@@ -7,9 +7,19 @@ services:
       - ./:/app
     ports:
       - 9501:9501
+    depends_on:
+      - db
+      - redis
+      - rabbitmq
     environment:
       - APP_ENV=dev
       - SCAN_CACHEABLE=false
+      - APP_NAME=simplified-payment-gateway
+      - TRACER_ENABLE_DB=true
+      - TRACER_ENABLE_REDIS=true
+      - TRACER_ENABLE_GUZZLE=true
+      - ZIPKIN_ENDPOINT_URL=http://tempo:9411/api/v2/spans
+      - PROMETHEUS_PORT=9502
 
   db:
     image: postgres:16-alpine
@@ -44,11 +54,53 @@ services:
     volumes:
       - rabbitmq-data:/var/lib/rabbitmq
 
-  zipkin:
-    image: openzipkin/zipkin:latest
-    container_name: zipkin
+  # LGTM Stack (All-in-One)
+  lgtm:
+    image: grafana/otel-lgtm
+    container_name: lgtm
     ports:
-      - "9411:9411"
+      - "3000:3000" # Grafana
+      - "4317:4317" # OTLP gRPC
+      - "4318:4318" # OTLP HTTP
+      - "3100:3100" # Loki
+      - "3200:3200" # Tempo
+      - "9090:9090" # Prometheus
+      - "9411:9411" # Zipkin
+    volumes:
+      - ./docker/otel-lgtm/otel-config.yaml:/otel-lgtm/otelcol-config.yaml
+      - ./docker/grafana/provisioning:/etc/grafana/provisioning
+    environment:
+      - ENABLE_LOGS_OTELCOL=true
+
+  promtail:
+    image: grafana/promtail:2.9.2
+    volumes:
+      - ./docker/promtail/config.yml:/etc/promtail/config.yml
+      - /var/lib/docker/containers:/var/lib/docker/containers
+    command: -config.file=/etc/promtail/config.yml
+    depends_on:
+      - lgtm
+
+  postgres-exporter:
+    image: prometheuscommunity/postgres-exporter
+    environment:
+      DATA_SOURCE_NAME: "postgresql://hyperf_user:hyperf_password@db:5432/hyperf_db?sslmode=disable"
+    ports:
+      - "9187:9187"
+    depends_on:
+      - db
+
+  rabbitmq-exporter:
+    image: kbudde/rabbitmq-exporter
+    container_name: rabbitmq-exporter
+    ports:
+      - "9419:9419"
+    environment:
+      RABBIT_URL: http://rabbitmq:15672
+      RABBIT_USER: hyperf_user
+      RABBIT_PASSWORD: hyperf_password
+    depends_on:
+      - rabbitmq
 
 volumes:
   rabbitmq-data:

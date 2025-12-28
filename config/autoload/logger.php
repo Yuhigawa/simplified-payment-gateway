@@ -22,11 +22,10 @@ return [
             ],
         ],
         'formatter' => [
-            'class' => Monolog\Formatter\LineFormatter::class,
+            'class' => Monolog\Formatter\JsonFormatter::class,
             'constructor' => [
-                'format' => null,
-                'dateFormat' => 'Y-m-d H:i:s',
-                'allowInlineLineBreaks' => true,
+                'batchMode' => Monolog\Formatter\JsonFormatter::BATCH_MODE_JSON,
+                'appendNewline' => true,
             ],
         ],
     ],
