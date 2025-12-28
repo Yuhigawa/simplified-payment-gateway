@@ -20,7 +20,12 @@ RUN set -ex \
 RUN apk add --no-cache \
     php83-pdo_pgsql \
     php83-pgsql \
-    postgresql-client
+    postgresql-client \
+    make
+
+# Install phpcpd via PHAR to avoid dependency conflicts
+RUN wget https://phar.phpunit.de/phpcpd.phar -O /usr/local/bin/phpcpd \
+    && chmod +x /usr/local/bin/phpcpd
 
 # RUN apk add --no-cache --virtual .build-deps \
 #     $PHPIZE_DEPS \

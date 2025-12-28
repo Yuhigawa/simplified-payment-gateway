@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<ruleset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" name="Hyperf" xsi:noNamespaceSchemaLocation="./vendor/squizlabs/php_codesniffer/phpcs.xsd">
+    <description>The coding standard for Hyperf.</description>
+
+    <file>app</file>
+    <file>config</file>
+
+    <exclude-pattern>config/*</exclude-pattern>
+
+    <arg name="basepath" value="."/>
+    <arg name="colors"/>
+    <arg name="parallel" value="75"/>
+    <arg value="p"/>
+    <arg name="encoding" value="utf-8"/>
+    <arg name="tab-width" value="4"/>
+
+    <rule ref="PSR12">
+        <!-- Allow file-level docblock to follow declare strict_types -->
+        <exclude name="PSR12.Files.FileHeader"/>
+    </rule>
+</ruleset>

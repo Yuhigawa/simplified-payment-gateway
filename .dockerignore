@@ -3,6 +3,7 @@
 runtime/*
 .config/
 .phpunit.cache/
+.pdepend/
 .composer/
 .bash_history
 vendor/

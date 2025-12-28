@@ -42,7 +42,9 @@
         "mockery/mockery": "^1.0",
         "phpstan/phpstan": "^1.0",
         "swoole/ide-helper": "^5.0",
-        "gokure/hyperf-tinker": "^2.1"
+        "gokure/hyperf-tinker": "^2.1",
+        "squizlabs/php_codesniffer": "^3.7",
+        "phpmd/phpmd": "^2.13"
     },
     "suggest": {
         "ext-openssl": "Required to use HTTPS.",

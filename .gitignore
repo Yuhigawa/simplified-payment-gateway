@@ -9,6 +9,7 @@ Dockerfile.bkp
 .config/
 .phpunit.cache/
 .composer/
+.pdepend/
 vendor/
 runtime/
 postgres_data/
