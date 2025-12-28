@@ -11,7 +11,6 @@ use Hyperf\Di\Annotation\Inject;
 use Hyperf\Logger\LoggerFactory;
 use Hyperf\Amqp\Result;
 use Psr\Log\LoggerInterface;
-
 use App\Module\Account\Domain\Repository\UserRepositoryInterface;
 use App\Module\Transaction\Application\Service\TransferService;
 

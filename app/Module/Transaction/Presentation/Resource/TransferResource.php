@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Module\Transaction\Presentation\Resource;
 
 use Hyperf\Resource\Json\JsonResource;
-
 use App\Module\Account\Presentation\Resource\UserResource;
 
 class TransferResource extends JsonResource

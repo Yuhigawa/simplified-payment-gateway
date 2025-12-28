@@ -10,7 +10,7 @@ use App\Module\Account\Domain\ValueObject\Id;
 use Hyperf\Database\Model\Events\Creating;
 
 class User extends BaseModel
-{   
+{
     protected ?string $connection = 'default';
     protected ?string $table = 'users';
     protected string $keyType = 'string';
@@ -48,7 +48,8 @@ class User extends BaseModel
 
     public function setPasswordAttribute($password): void
     {
-        $this->attributes['password'] = password_hash($password, PASSWORD_BCRYPT);;
+        $this->attributes['password'] = password_hash($password, PASSWORD_BCRYPT);
+        ;
     }
 
     public function setEmailAttribute($email): void

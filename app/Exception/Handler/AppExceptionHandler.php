@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 /**
  * This file is part of Hyperf.
  *
@@ -26,10 +27,15 @@ class AppExceptionHandler extends ExceptionHandler
 
     public function handle(Throwable $throwable, ResponsePlusInterface $response)
     {
-        $this->logger->error(sprintf('%s[%s] in %s', $throwable->getMessage(), $throwable->getLine(), $throwable->getFile()));
+        $this->logger->error(
+            sprintf('%s[%s] in %s', $throwable->getMessage(), $throwable->getLine(), $throwable->getFile())
+        );
         $this->logger->error($throwable->getTraceAsString());
         $this->stopPropagation();
-        return $response->addHeader('Server', 'Hyperf')->setStatus(500)->setBody(new SwooleStream('Internal Server Error.'));
+        return $response
+            ->addHeader('Server', 'Hyperf')
+            ->setStatus(500)
+            ->setBody(new SwooleStream('Internal Server Error.'));
     }
 
     public function isValid(Throwable $throwable): bool

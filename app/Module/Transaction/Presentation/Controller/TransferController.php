@@ -6,7 +6,6 @@ namespace App\Module\Transaction\Presentation\Controller;
 
 use Hyperf\Di\Annotation\Inject;
 use Hyperf\HttpServer\Annotation\Controller;
-
 use App\Module\Transaction\Application\Service\TransferService;
 use App\Module\Transaction\Presentation\Request\TransferRequest;
 

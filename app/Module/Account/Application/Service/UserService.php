@@ -6,12 +6,10 @@ namespace App\Module\Account\Application\Service;
 
 use Exception;
 use Throwable;
-
 use Psr\Log\LoggerInterface;
 use Hyperf\Logger\LoggerFactory;
 use Hyperf\Di\Annotation\Inject;
 use Hyperf\Context\ApplicationContext;
-
 use App\Module\Account\Domain\Entity\User;
 use App\Module\Account\Domain\Exception\UserException;
 use App\Module\Account\Infra\Persistence\UserRepository;
@@ -39,7 +37,7 @@ class UserService
             if (!$user) {
                 throw new Exception('User was not created.');
             }
-            
+
             return $user;
         } catch (\Throwable $e) {
             $this->logger->debug('[USER-SERVICE] - createUser', [
@@ -60,7 +58,7 @@ class UserService
             }
 
             return $user;
-        } catch(\Throwable $e) {
+        } catch (\Throwable $e) {
             $this->logger->debug('[USER-SERVICE] - findUser', [
                 'msg' => $e->getMessage()
             ]);

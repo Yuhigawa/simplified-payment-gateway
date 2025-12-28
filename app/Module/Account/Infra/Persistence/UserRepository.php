@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Module\Account\Infra\Persistence;
 
 use Hyperf\DbConnection\Db;
-
 use App\Module\Account\Domain\Entity\User;
 use App\Module\Account\Domain\Repository\UserRepositoryInterface;
 
@@ -65,7 +64,7 @@ class UserRepository implements UserRepositoryInterface
         $affected = DB::table(self::TABLE_NAME)
             ->where(self::ID_COLUMN, (int)$userId)
             ->update($data);
-        
+
         return $affected > 0;
     }
 }

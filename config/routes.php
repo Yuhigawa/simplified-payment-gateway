@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 /**
  * This file is part of Hyperf.
  *
@@ -9,8 +10,8 @@ declare(strict_types=1);
  * @contact  group@hyperf.io
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
-use Hyperf\HttpServer\Router\Router;
 
+use Hyperf\HttpServer\Router\Router;
 use App\Module\Account\Presentation\Controller\UserController;
 use App\Module\Transaction\Presentation\Controller\TransferController;
 

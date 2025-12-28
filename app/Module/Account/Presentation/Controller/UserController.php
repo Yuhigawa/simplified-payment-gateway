@@ -6,11 +6,9 @@ namespace App\Module\Account\Presentation\Controller;
 
 use Hyperf\Di\Annotation\Inject;
 use Hyperf\HttpServer\Annotation\Controller;
-
 use App\Module\Account\Application\Service\UserService;
 use App\Module\Account\Presentation\Resource\UserResource;
 use App\Module\Account\Presentation\Request\CreateUserRequest;
-
 
 #[Controller]
 class UserController

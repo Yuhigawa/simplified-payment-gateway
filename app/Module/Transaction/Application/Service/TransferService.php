@@ -9,18 +9,12 @@ use Hyperf\Di\Annotation\Inject;
 use Hyperf\Logger\LoggerFactory;
 use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
-
 use App\Module\Transaction\Domain\Entity\Transaction;
 use App\Module\Transaction\Infra\Amqp\TransferProducer;
 use App\Module\Transaction\Domain\Exception\TransferException;
 use App\Module\Transaction\Application\Handler\TransferContext;
 use App\Module\Account\Domain\Repository\UserRepositoryInterface;
-use App\Module\Transaction\Application\Handler\NotifyPayeeHandler;
-use App\Module\Transaction\Domain\Handler\AbstractTransferHandler;
-use App\Module\Transaction\Application\Handler\ExecuteTransferHandler;
-use App\Module\Transaction\Application\Handler\ValidateBalanceHandler;
-use App\Module\Transaction\Application\Handler\ValidateUserTypeHandler;
-use App\Module\Transaction\Application\Handler\AuthorizeTransferHandler;
+use App\Module\Transaction\Application\Factory\TransferHandlerFactory;
 
 class TransferService
 {
@@ -38,6 +32,9 @@ class TransferService
 
     #[Inject]
     protected LoggerInterface $logger;
+
+    #[Inject]
+    protected TransferHandlerFactory $transferHandlerFactory;
 
     public function __construct(ContainerInterface $container)
     {
@@ -108,7 +105,7 @@ class TransferService
         $context = new TransferContext($data['value'], $payer, $payee);
 
         try {
-            $validateUserType = $this->startHandler();
+            $validateUserType = $this->transferHandlerFactory->create();
             $validateUserType->handle($context);
 
             if ($context->hasErrors()) {
@@ -138,22 +135,5 @@ class TransferService
         }
 
         return (int) $valor;
-    }
-
-    private function startHandler(): AbstractTransferHandler
-    {
-        $validateUserType = $this->container->get(ValidateUserTypeHandler::class);
-        $validateBalance = $this->container->get(ValidateBalanceHandler::class);
-        $authorizeTransfer = $this->container->get(AuthorizeTransferHandler::class);
-        $executeTransfer = $this->container->get(ExecuteTransferHandler::class);
-        $notifyPayee = $this->container->get(NotifyPayeeHandler::class);
-
-        $validateUserType
-            ->setNext($validateBalance)
-            ->setNext($authorizeTransfer)
-            ->setNext($executeTransfer)
-            ->setNext($notifyPayee);
-
-        return $validateUserType;
     }
 }

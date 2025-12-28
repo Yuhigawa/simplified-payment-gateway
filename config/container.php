@@ -1,9 +1,11 @@
 <?php
+
 /**
  * Initialize a dependency injection container that implemented PSR-11 and return the container.
  */
 
 declare(strict_types=1);
+
 /**
  * This file is part of Hyperf.
  *

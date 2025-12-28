@@ -6,7 +6,6 @@ namespace App\Module\Account\Domain\ValueObject;
 
 use Hyperf\Constants\AbstractConstants;
 use Hyperf\Constants\Annotation\Constants;
-
 use Hyperf\Snowflake\Configuration;
 use Hyperf\Snowflake\IdGenerator\SnowflakeIdGenerator;
 use Hyperf\Snowflake\MetaGeneratorInterface;

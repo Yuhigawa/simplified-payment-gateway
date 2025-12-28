@@ -12,4 +12,3 @@ interface TransferHandlerInterface
 
     public function setNext(TransferHandlerInterface $handler): TransferHandlerInterface;
 }
-

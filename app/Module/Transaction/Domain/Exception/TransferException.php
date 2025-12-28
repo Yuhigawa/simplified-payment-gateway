@@ -50,4 +50,3 @@ class TransferException extends HttpException
         return new BadRequestHttpException('Failed to queue transfer: ' . $message);
     }
 }
-
