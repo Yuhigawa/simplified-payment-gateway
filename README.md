@@ -150,14 +150,14 @@ Useful commands for local development:
 # Run Tests
 docker-compose exec app composer test
 
-# Static Analysis (PHPStan)
-docker-compose exec app composer analyse
+# Code validation
+docker-compose exec app make ci
 
 # Code Style Fixer
-docker-compose exec app composer cs-fix
+docker-compose exec app make cs-fix
 
 # Watch Mode (Hot Reload)
-php bin/hyperf.php server:watch
+$HF server:watch
 ```
 
 ## 🔐 Business Rules
