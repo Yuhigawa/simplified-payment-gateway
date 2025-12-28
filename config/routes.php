@@ -32,3 +32,9 @@ Router::addGroup('/api/v1/transactions', function () {
     Router::post('/transfer', [TransferController::class, 'transfer']);
     Router::get('/transaction-sse', [TransferController::class, 'sse']);
 });
+
+Router::get('/metrics', function () {
+    $registry = \Hyperf\Context\ApplicationContext::getContainer()->get(\Prometheus\CollectorRegistry::class);
+    $renderer = new \Prometheus\RenderTextFormat();
+    return $renderer->render($registry->getMetricFamilySamples());
+});

@@ -9,7 +9,7 @@ use Hyperf\Amqp\Message\ProducerMessage;
 
 #[Producer(
     exchange: 'hyperf',
-    routingKey: 'hyperf.transfer'
+    routingKey: 'hyperf.transfer',
 )]
 class TransferProducer extends ProducerMessage
 {

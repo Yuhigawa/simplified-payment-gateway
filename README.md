@@ -1,6 +1,6 @@
 # Simplified Payment Gateway
 
-![PHP](https://img.shields.io/badge/PHP-8.1%2B-777BB4?style=for-the-badge&logo=php&logoColor=white)
+![PHP](https://img.shields.io/badge/PHP-8.3%2B-777BB4?style=for-the-badge&logo=php&logoColor=white)
 ![Hyperf](https://img.shields.io/badge/Hyperf-3.1-3C873A?style=for-the-badge&logo=php&logoColor=white)
 ![Swoole](https://img.shields.io/badge/Swoole-5.0-003366?style=for-the-badge&logo=swoole&logoColor=white)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-336791?style=for-the-badge&logo=postgresql&logoColor=white)
@@ -150,14 +150,14 @@ Useful commands for local development:
 # Run Tests
 docker-compose exec app composer test
 
-# Static Analysis (PHPStan)
-docker-compose exec app composer analyse
+# Code validation
+docker-compose exec app make ci
 
 # Code Style Fixer
-docker-compose exec app composer cs-fix
+docker-compose exec app make cs-fix
 
 # Watch Mode (Hot Reload)
-php bin/hyperf.php server:watch
+$HF server:watch
 ```
 
 ## 🔐 Business Rules
