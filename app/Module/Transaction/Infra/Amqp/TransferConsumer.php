@@ -20,7 +20,7 @@ use App\Module\Transaction\Application\Service\TransferService;
     queue: 'hyperf.transfer.queue',
     name: 'TransferConsumer',
     nums: 1,
-    enable: true
+    enable: true,
 )]
 class TransferConsumer extends ConsumerMessage
 {
